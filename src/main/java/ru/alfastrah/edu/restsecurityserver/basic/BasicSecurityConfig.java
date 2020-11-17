@@ -1,4 +1,4 @@
-package ru.alfastrah.edu.restsecurityserver.baisc;
+package ru.alfastrah.edu.restsecurityserver.basic;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
