@@ -22,28 +22,42 @@ class ContractControllerTest {
 
     @Test
     void getContractsTest() {
-        String data = restTemplate
+        String data = restTemplate.withBasicAuth("user", "password")
                 .getForObject("/contract", String.class);
         assertEquals("[]", data);
+    }
+
+    @Test
+    void getContractsWrongPasswordTest() {
+        ResponseEntity<Contract> data = restTemplate.withBasicAuth("user", "wrong password")
+                .getForEntity("/contract", Contract.class);
+        assertEquals(HttpStatus.UNAUTHORIZED, data.getStatusCode());
+    }
+
+    @Test
+    void postContractsAccessDeniedTest() {
+        ResponseEntity<Contract> nonExistingContractEntity = restTemplate.withBasicAuth("user", "password")
+                .postForEntity("/contract", generateContract(), Contract.class);
+        assertEquals(HttpStatus.FORBIDDEN, nonExistingContractEntity.getStatusCode());
     }
 
     @Test
     void contractTest() {
         Contract contract = generateContract();
 
-        Contract postContract = restTemplate
+        Contract postContract = restTemplate.withBasicAuth("superuser", "password")
                 .postForObject("/contract", contract, Contract.class);
         assertThat(postContract).isEqualToIgnoringGivenFields(contract, "id");
         assertNotNull(postContract.getId());
 
-        Contract getContract = restTemplate
+        Contract getContract = restTemplate.withBasicAuth("user", "password")
                 .getForObject("/contract/" + postContract.getId(), Contract.class);
         assertEquals(postContract, getContract);
 
-        restTemplate
+        restTemplate.withBasicAuth("superuser", "password")
                 .delete("/contract/"+postContract.getId(), contract, Contract.class);
 
-        ResponseEntity<Contract> nonExistingContractEntity = restTemplate
+        ResponseEntity<Contract> nonExistingContractEntity = restTemplate.withBasicAuth("user", "password")
                 .getForEntity("/contract/" + postContract.getId(), Contract.class);
         assertEquals(HttpStatus.NOT_FOUND, nonExistingContractEntity.getStatusCode());
     }
