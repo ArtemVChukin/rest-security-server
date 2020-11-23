@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class RestSecurityServerApplicationTests {
 
 	@Test
+	@SuppressWarnings({"java:S2699", "EmptyMethod"})
 	void contextLoads() {
 	}
 

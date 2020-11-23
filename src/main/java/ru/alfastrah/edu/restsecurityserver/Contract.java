@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 public class Contract {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String number;
     private LocalDate beginDate;
