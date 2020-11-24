@@ -2,10 +2,11 @@ package ru.alfastrah.edu.restsecurityserver;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,15 +19,5 @@ public class UserController {
     public User addUser(@RequestBody @Valid User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return customUserDetailsService.addUser(user);
-    }
-
-    @DeleteMapping("/user/{username}")
-    public void addUser(@PathVariable String username) {
-        customUserDetailsService.deleteByUsername(username);
-    }
-
-    @GetMapping("/user")
-    public List<User> getUsers(@RequestParam(required = false) String username, @RequestParam(required = false) String department) {
-        return customUserDetailsService.getUsers(username, department);
     }
 }

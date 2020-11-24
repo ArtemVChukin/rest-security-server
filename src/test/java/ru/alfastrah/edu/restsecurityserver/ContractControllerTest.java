@@ -19,9 +19,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 class ContractControllerTest {
     @Autowired
     TestRestTemplate restTemplate;
+    @Autowired
+    UserRepository userRepository;
 
     @Test
     void getContractsTest() {
+        userRepository.findAll().forEach(System.out::println);
         String data = restTemplate.withBasicAuth("user", "password")
                 .getForObject("/contract", String.class);
         assertEquals("[]", data);
@@ -55,7 +58,7 @@ class ContractControllerTest {
         assertEquals(postContract, getContract);
 
         restTemplate.withBasicAuth("superuser", "password")
-                .delete("/contract/"+postContract.getId(), contract, Contract.class);
+                .delete("/contract/" + postContract.getId(), contract, Contract.class);
 
         ResponseEntity<Contract> nonExistingContractEntity = restTemplate.withBasicAuth("user", "password")
                 .getForEntity("/contract/" + postContract.getId(), Contract.class);
