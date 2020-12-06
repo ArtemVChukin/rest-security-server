@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.*;
+import static org.springframework.http.HttpMethod.GET;
 import static ru.alfastrah.edu.restsecurityserver.ContractController.CONTRACT_BASE_URL;
 
 @Configuration
@@ -23,9 +23,7 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     @Setter(onMethod = @__({@Autowired}))
     private JwtUserDetailsService userDetailsService;
     @Setter(onMethod = @__({@Autowired}))
-    PasswordEncoder passwordEncoder;
-    @Setter(onMethod = @__({@Autowired}))
-    JwtRequestFilter jwtRequestFilter;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -35,14 +33,15 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .mvcMatchers(POST, CONTRACT_BASE_URL).hasRole(SUPERUSER)
-                .mvcMatchers(DELETE, CONTRACT_BASE_URL).hasRole(SUPERUSER)
-                .mvcMatchers(GET, CONTRACT_BASE_URL).hasAnyRole(SUPERUSER, USER)
+        http.authorizeRequests()
+                .mvcMatchers(CONTRACT_BASE_URL).hasAnyRole(SUPERUSER, ADMIN)
+                .mvcMatchers(GET, CONTRACT_BASE_URL).hasAnyRole(USER, SUPERUSER, ADMIN)
                 .mvcMatchers("/user").hasRole(ADMIN)
                 .mvcMatchers("/").denyAll()
-                .and().csrf().disable();
+                .and().csrf().disable()
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService))
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), userDetailsService))
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean
