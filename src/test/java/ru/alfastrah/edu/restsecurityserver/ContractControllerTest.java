@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static ru.alfastrah.edu.restsecurityserver.ContractController.CONTRACT_BASE_URL;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class ContractControllerTest {
@@ -62,19 +63,19 @@ class ContractControllerTest {
         Contract contract = generateContract();
 
         Contract postContract = restTemplate
-                .postForObject("/contract", contract, Contract.class);
+                .postForObject(CONTRACT_BASE_URL, contract, Contract.class);
         assertThat(postContract).isEqualToIgnoringGivenFields(contract, "id");
         assertNotNull(postContract.getId());
 
         Contract getContract = restTemplate
-                .getForObject("/contract/" + postContract.getId(), Contract.class);
+                .getForObject(CONTRACT_BASE_URL + "/" + postContract.getId(), Contract.class);
         assertEquals(postContract, getContract);
 
         restTemplate
-                .delete("/contract/" + postContract.getId(), contract, Contract.class);
+                .delete(CONTRACT_BASE_URL + "/" + postContract.getId(), contract, Contract.class);
 
         ResponseEntity<Contract> nonExistingContractEntity = restTemplate
-                .getForEntity("/contract/" + postContract.getId(), Contract.class);
+                .getForEntity(CONTRACT_BASE_URL + "/" + postContract.getId(), Contract.class);
         assertEquals(HttpStatus.NOT_FOUND, nonExistingContractEntity.getStatusCode());
     }
 
