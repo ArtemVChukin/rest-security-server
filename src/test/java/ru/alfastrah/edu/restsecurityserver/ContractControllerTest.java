@@ -52,14 +52,14 @@ class ContractControllerTest {
         assertNotNull(postContract.getId());
 
         Contract getContract = restTemplate.withBasicAuth("user", "password")
-                .getForObject(CONTRACT_BASE_URL + postContract.getId(), Contract.class);
+                .getForObject(CONTRACT_BASE_URL + "/" + postContract.getId(), Contract.class);
         assertEquals(postContract, getContract);
 
         restTemplate.withBasicAuth("superuser", "password")
-                .delete(CONTRACT_BASE_URL + postContract.getId(), contract, Contract.class);
+                .delete(CONTRACT_BASE_URL + "/" + postContract.getId());
 
         ResponseEntity<Contract> nonExistingContractEntity = restTemplate.withBasicAuth("user", "password")
-                .getForEntity(CONTRACT_BASE_URL + postContract.getId(), Contract.class);
+                .getForEntity(CONTRACT_BASE_URL + "/" + postContract.getId(), Contract.class);
         assertEquals(HttpStatus.NOT_FOUND, nonExistingContractEntity.getStatusCode());
     }
 
