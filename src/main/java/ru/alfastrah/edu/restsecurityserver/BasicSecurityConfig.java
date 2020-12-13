@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -25,13 +26,15 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic()
-                .and().authorizeRequests()
+        http.httpBasic().and()
+                .authorizeRequests()
                 .antMatchers(POST, "/contract").hasRole(SUPERUSER)
                 .antMatchers(DELETE, "/contract/*").hasRole(SUPERUSER)
                 .antMatchers(GET, "/contract").hasAnyRole(SUPERUSER, USER)
                 .antMatchers(GET, "/contract/*").hasAnyRole(SUPERUSER, USER)
                 .antMatchers("/**").denyAll()
+                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable();
+        ;
     }
 }
