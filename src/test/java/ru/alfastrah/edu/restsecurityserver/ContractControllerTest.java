@@ -42,7 +42,7 @@ class ContractControllerTest {
         assertEquals(postContract, getContract);
 
         restTemplate
-                .delete("/contract/" + postContract.getId(), contract, Contract.class);
+                .delete(CONTRACT_BASE_URL + "/" + postContract.getId(), contract, Contract.class);
 
         ResponseEntity<Contract> nonExistingContractEntity = restTemplate
                 .getForEntity(CONTRACT_BASE_URL + "/" + postContract.getId(), Contract.class);
