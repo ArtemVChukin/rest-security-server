@@ -20,28 +20,25 @@ import static ru.alfastrah.edu.restsecurityserver.ContractController.CONTRACT_BA
 class ContractControllerTest {
     @Autowired
     TestRestTemplate restTemplate;
-    @Autowired
-    UserRepository userRepository;
 
     @Test
     void getContractsTest() {
-        userRepository.findAll().forEach(System.out::println);
         String data = restTemplate.withBasicAuth("user", "password")
-                .getForObject("/contract", String.class);
+                .getForObject(CONTRACT_BASE_URL, String.class);
         assertEquals("[]", data);
     }
 
     @Test
     void getContractsWrongPasswordTest() {
         ResponseEntity<Contract> data = restTemplate.withBasicAuth("user", "wrong password")
-                .getForEntity("/contract", Contract.class);
+                .getForEntity(CONTRACT_BASE_URL, Contract.class);
         assertEquals(HttpStatus.UNAUTHORIZED, data.getStatusCode());
     }
 
     @Test
     void postContractsAccessDeniedTest() {
         ResponseEntity<Contract> nonExistingContractEntity = restTemplate.withBasicAuth("user", "password")
-                .postForEntity("/contract", generateContract(), Contract.class);
+                .postForEntity(CONTRACT_BASE_URL, generateContract(), Contract.class);
         assertEquals(HttpStatus.FORBIDDEN, nonExistingContractEntity.getStatusCode());
     }
 
@@ -59,7 +56,7 @@ class ContractControllerTest {
         assertEquals(postContract, getContract);
 
         restTemplate.withBasicAuth("superuser", "password")
-                .delete(CONTRACT_BASE_URL + "/" + postContract.getId(), contract, Contract.class);
+                .delete(CONTRACT_BASE_URL + "/" + postContract.getId());
 
         ResponseEntity<Contract> nonExistingContractEntity = restTemplate.withBasicAuth("user", "password")
                 .getForEntity(CONTRACT_BASE_URL + "/" + postContract.getId(), Contract.class);
