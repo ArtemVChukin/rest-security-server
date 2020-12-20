@@ -29,21 +29,15 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
         String authHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith(TOKEN_PREFIX)) {
-            chain.doFilter(req, res);
-            return;
+        if (authHeader != null && authHeader.startsWith(TOKEN_PREFIX)) {
+            try {
+                UserDetails userDetails = parseJwtTokenFunction.apply(authHeader);
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+            } catch (RuntimeException e) {
+                throw new BadCredentialsException("Failed to parse token: ");
+            }
         }
-        setAuthentication(authHeader);
         chain.doFilter(req, res);
-    }
-
-    private void setAuthentication(String authHeader) {
-        try {
-            UserDetails userDetails = parseJwtTokenFunction.apply(authHeader);
-            SecurityContextHolder.getContext().setAuthentication(
-                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-        } catch (RuntimeException e) {
-            throw new BadCredentialsException("Failed to parse token: ");
-        }
     }
 }
