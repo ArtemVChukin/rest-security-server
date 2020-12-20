@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -15,18 +16,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static ru.alfastrah.edu.restsecurityserver.JwtUserDetailsService.TOKEN_PREFIX;
+import java.util.function.Function;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final Function<UserDetails, String> createJwtTokenFunction;
     private final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUserDetailsService jwtUserDetailsService) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, Function<UserDetails, String> createJwtTokenFunction) {
         this.authenticationManager = authenticationManager;
-        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.createJwtTokenFunction = createJwtTokenFunction;
     }
 
     @Override
@@ -42,9 +42,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
-        User user = jwtUserDetailsService.loadUserByUsername(((User) auth.getPrincipal()).getUsername());
-        String token = jwtUserDetailsService.createJwtToken(user);
-        res.addHeader(HttpHeaders.AUTHORIZATION, TOKEN_PREFIX + token);
+        String token = createJwtTokenFunction.apply((UserDetails) auth.getPrincipal());
+        res.addHeader(HttpHeaders.AUTHORIZATION, token);
     }
 
     @Getter

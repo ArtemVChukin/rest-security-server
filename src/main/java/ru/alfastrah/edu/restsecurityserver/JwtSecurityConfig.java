@@ -20,7 +20,9 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String SUPERUSER = "SUPERUSER";
 
     @Setter(onMethod = @__({@Autowired}))
-    private JwtUserDetailsService userDetailsService;
+    private CustomUserDetailsService userDetailsService;
+    @Setter(onMethod = @__({@Autowired}))
+    private JwtService jwtService;
     @Setter(onMethod = @__({@Autowired}))
     private PasswordEncoder passwordEncoder;
 
@@ -38,8 +40,8 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/user").permitAll()
                 .mvcMatchers("/").denyAll()
                 .and().csrf().disable()
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService))
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), userDetailsService))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtService::parseJwtToken))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService::createJwtToken))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 

@@ -12,12 +12,12 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class UserController {
     private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
     @PostMapping("/user")
     @SuppressWarnings("java:S4684")
     public User addUser(@RequestBody @Valid User user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        return customUserDetailsService.addUser(user);
     }
 }

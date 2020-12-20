@@ -13,15 +13,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.function.Function;
 
-import static ru.alfastrah.edu.restsecurityserver.JwtUserDetailsService.TOKEN_PREFIX;
+import static ru.alfastrah.edu.restsecurityserver.JwtService.TOKEN_PREFIX;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-    private final JwtUserDetailsService jwtUserDetailsService;
+    private final Function<String, UserDetails> parseJwtTokenFunction;
 
-    public JwtAuthorizationFilter(AuthenticationManager authManager, JwtUserDetailsService jwtUserDetailsService) {
+    public JwtAuthorizationFilter(AuthenticationManager authManager, Function<String, UserDetails> parseJwtTokenFunction) {
         super(authManager);
-        this.jwtUserDetailsService = jwtUserDetailsService;
+        this.parseJwtTokenFunction = parseJwtTokenFunction;
     }
 
     @Override
@@ -38,8 +39,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private void setAuthentication(String authHeader) {
         try {
-            String jwtToken = authHeader.substring(TOKEN_PREFIX.length());
-            UserDetails userDetails = jwtUserDetailsService.loadUserByJwtToken(jwtToken);
+            UserDetails userDetails = parseJwtTokenFunction.apply(authHeader);
             SecurityContextHolder.getContext().setAuthentication(
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
         } catch (RuntimeException e) {
