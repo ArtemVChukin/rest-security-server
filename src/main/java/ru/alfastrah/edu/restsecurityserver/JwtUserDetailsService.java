@@ -40,7 +40,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     }
 
     public UserDetails loadUserByJwtToken(String jwtToken) {
-        Claims claims = extractClaim(jwtToken);
+        Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).getBody();
         if (claims.getExpiration().before(new Date())) {
             throw new AccessDeniedException("Token has expired");
         }
@@ -49,9 +49,5 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new AccessDeniedException("Invalid username");
         }
         return user;
-    }
-
-    private Claims extractClaim(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 }

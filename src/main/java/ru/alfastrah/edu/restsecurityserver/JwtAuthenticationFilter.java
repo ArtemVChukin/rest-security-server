@@ -18,13 +18,13 @@ import java.util.ArrayList;
 
 import static ru.alfastrah.edu.restsecurityserver.JwtUserDetailsService.TOKEN_PREFIX;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final JwtUserDetailsService jwtUserDetailsService;
     private final ObjectMapper objectMapper = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JwtUserDetailsService jwtUserDetailsService) {
+    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUserDetailsService jwtUserDetailsService) {
         this.authenticationManager = authenticationManager;
         this.jwtUserDetailsService = jwtUserDetailsService;
     }

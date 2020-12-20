@@ -39,7 +39,7 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/").denyAll()
                 .and().csrf().disable()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService))
-                .addFilter(new JWTAuthenticationFilter(authenticationManager(), userDetailsService))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), userDetailsService))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
