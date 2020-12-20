@@ -18,7 +18,6 @@ import static ru.alfastrah.edu.restsecurityserver.ContractController.CONTRACT_BA
 public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER = "USER";
     private static final String SUPERUSER = "SUPERUSER";
-    private static final String ADMIN = "ADMIN";
 
     @Setter(onMethod = @__({@Autowired}))
     private JwtUserDetailsService userDetailsService;
@@ -34,9 +33,9 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .mvcMatchers(CONTRACT_BASE_URL).hasAnyRole(SUPERUSER, ADMIN)
-                .mvcMatchers(GET, CONTRACT_BASE_URL).hasAnyRole(USER, SUPERUSER, ADMIN)
-                .mvcMatchers("/user").hasRole(ADMIN)
+                .mvcMatchers(CONTRACT_BASE_URL).hasRole(SUPERUSER)
+                .mvcMatchers(GET, CONTRACT_BASE_URL).hasAnyRole(USER, SUPERUSER)
+                .mvcMatchers("/user").permitAll()
                 .mvcMatchers("/").denyAll()
                 .and().csrf().disable()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), userDetailsService))
