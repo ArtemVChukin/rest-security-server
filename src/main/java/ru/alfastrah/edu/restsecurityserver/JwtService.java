@@ -20,6 +20,17 @@ public class JwtService {
     @Value("${jwt.expiration.seconds}")
     private Long expirationSeconds;
 
+    public String createJwtToken(UserDetails userDetails) {
+        String authority = !userDetails.getAuthorities().isEmpty()
+                ? userDetails.getAuthorities().iterator().next().getAuthority()
+                : "";
+        return TOKEN_PREFIX + Jwts.builder().setClaims(new HashMap<>(Map.of("Authority", authority)))
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationSeconds * 1000L))
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
+    }
+
     public UserDetails parseJwtToken(String token) {
         String jwtToken = token.substring(TOKEN_PREFIX.length());
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken).getBody();
@@ -30,16 +41,5 @@ public class JwtService {
         user.setUsername(claims.getSubject());
         user.setRoles(claims.get("Authority", String.class));
         return user;
-    }
-
-    public String createJwtToken(UserDetails userDetails) {
-        String authority = !userDetails.getAuthorities().isEmpty()
-                ? userDetails.getAuthorities().iterator().next().getAuthority()
-                : "";
-        return TOKEN_PREFIX + Jwts.builder().setClaims(new HashMap<>(Map.of("Authority", authority)))
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationSeconds * 1000L))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 }
