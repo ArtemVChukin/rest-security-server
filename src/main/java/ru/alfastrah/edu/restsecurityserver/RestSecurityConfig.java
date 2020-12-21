@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import static org.springframework.http.HttpMethod.*;
 
 @Configuration
-public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
+public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER = "USER";
     private static final String SUPERUSER = "SUPERUSER";
 
