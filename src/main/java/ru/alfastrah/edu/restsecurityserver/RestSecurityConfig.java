@@ -21,15 +21,11 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Setter(onMethod = @__({@Autowired}))
     private CustomUserDetailsService userDetailsService;
-    @Setter(onMethod = @__({@Autowired}))
-    private JwtService jwtService;
-    @Setter(onMethod = @__({@Autowired}))
-    private PasswordEncoder passwordEncoder;
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
+                .passwordEncoder(passwordEncoder());
     }
 
     @Override
@@ -40,8 +36,6 @@ public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
                 .mvcMatchers("/user").permitAll()
                 .mvcMatchers("/").denyAll()
                 .and().csrf().disable()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService::createJwtToken))
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtService::parseJwtToken))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
