@@ -15,10 +15,9 @@ import static org.springframework.http.HttpMethod.*;
 import static ru.alfastrah.edu.restsecurityserver.ContractController.CONTRACT_BASE_URL;
 
 @Configuration
-public class CustomSecurityConfig extends WebSecurityConfigurerAdapter {
+public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER = "USER";
     private static final String SUPERUSER = "SUPERUSER";
-    private static final String ADMIN = "ADMIN";
 
     @Setter(onMethod = @__({@Autowired}))
     private CustomUserDetailsService userDetailsService;
@@ -35,10 +34,9 @@ public class CustomSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.httpBasic().and()
                 .authorizeRequests()
-                .mvcMatchers(POST, CONTRACT_BASE_URL).hasRole(SUPERUSER)
-                .mvcMatchers(DELETE, CONTRACT_BASE_URL).hasRole(SUPERUSER)
                 .mvcMatchers(GET, CONTRACT_BASE_URL).hasAnyRole(SUPERUSER, USER)
-                .mvcMatchers("/user").hasRole(ADMIN)
+                .mvcMatchers(CONTRACT_BASE_URL).hasRole(SUPERUSER)
+                .mvcMatchers("/user").permitAll()
                 .mvcMatchers("/").denyAll()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().csrf().disable();
