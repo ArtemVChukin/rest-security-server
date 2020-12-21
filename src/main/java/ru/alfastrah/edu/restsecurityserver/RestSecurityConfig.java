@@ -15,7 +15,7 @@ import static org.springframework.http.HttpMethod.GET;
 import static ru.alfastrah.edu.restsecurityserver.ContractController.CONTRACT_BASE_URL;
 
 @Configuration
-public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
+public class RestSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USER = "USER";
     private static final String SUPERUSER = "SUPERUSER";
 
@@ -35,13 +35,13 @@ public class JwtSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .mvcMatchers(CONTRACT_BASE_URL).hasRole(SUPERUSER)
                 .mvcMatchers(GET, CONTRACT_BASE_URL).hasAnyRole(USER, SUPERUSER)
+                .mvcMatchers(CONTRACT_BASE_URL).hasRole(SUPERUSER)
                 .mvcMatchers("/user").permitAll()
                 .mvcMatchers("/").denyAll()
                 .and().csrf().disable()
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtService::parseJwtToken))
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtService::createJwtToken))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtService::parseJwtToken))
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
